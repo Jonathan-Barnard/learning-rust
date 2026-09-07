@@ -4,37 +4,37 @@
 // use crate::stack::Stack;
 
 #[derive(Debug)]
-struct Node {
-    elem: i32,
-    next: List,
+pub struct List {
+    head: Link,
 }
 
 #[derive(Debug)]
-enum List {
-    Empty,
-    More(Box<Node>),
+struct Node {
+    elem: i32,
+    next: Link,
 }
+
+type Link = Option<Box<Node>>;
 
 impl List {
     fn new() -> Self {
-        List::Empty
+        List {head: None}
     }
 
     fn push(&mut self, elem: i32) {
         let new_node = Box::new(Node {
             elem: elem,
-            next: std::mem::replace(self, List::Empty),
+            next: self.head.take(),
         });
 
-        *self = List::More(new_node);
+        self.head = Some(new_node);
     }
 
     fn pop(&mut self) -> Option<i32> {
-        println!("{:?}", self);
-        match self {
-            List::Empty => None,
-            List::More(node) => {
-                *self = node.next;
+        match self.head.take() {
+            None => None,
+            Some(node) => {
+                self.head = node.next;
                 Some(node.elem)
             }
         }
@@ -45,6 +45,7 @@ fn main() {
     let mut ll = List::new();
     ll.push(3);
     ll.push(2);
+    ll.push(4);
     let v = ll.pop();
     println!("{}", v.unwrap());
     println!("{:?}", ll)
